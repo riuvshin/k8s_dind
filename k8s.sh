@@ -124,5 +124,5 @@ LOCAL_IP_ADDRESS=$(detectIP)
 DNS_PROVIDER=${DNS_PROVIDER:-"nip.io"}
 IP=${IP:-${LOCAL_IP_ADDRESS}}
 CHE_MULTIUSER=${CHE_MULTIUSER:-"false"}
-K8S_STORAGE_PATH=${K8S_STORAGE_PATH:-"/home/codenvy/k8s_dind_storage"}
+K8S_STORAGE_PATH=${K8S_STORAGE_PATH:-"~/k8s_dind_storage"}
 $@
