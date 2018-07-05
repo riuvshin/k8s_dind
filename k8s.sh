@@ -97,16 +97,13 @@ install_helm() {
 
 get_che_helm_charts() {
     echo "[k8s] get CHE helm charts"
-    #docker exec -i k8s_dind bash -c "apt-get -qq update &>/dev/null && apt-get -qq install git -y &>/dev/null"
-    #docker exec -i k8s_dind bash -c "cd /tmp/ && git clone --depth 1 https://github.com/eclipse/che.git che &>/dev/null"
-    docker exec -i k8s_dind bash -c "apt-get update && apt-get install git -y"
-    docker exec -i k8s_dind bash -c "cd /tmp/ && git clone --depth 1 https://github.com/eclipse/che.git che"
-
+    docker exec -i k8s_dind bash -c "apt-get -qq update &>/dev/null && apt-get -qq install git -y &>/dev/null"
+    docker exec -i k8s_dind bash -c "cd /root/ && git clone --depth 1 https://github.com/eclipse/che.git che &>/dev/null"
 }
 
 create_tiller_sa() {
     echo "[k8s] create tiller SA"
-    docker exec -i k8s_dind bash -c "kubectl create serviceaccount tiller --namespace kube-system && sleep 20 && kubectl apply -f /tmp/che/deploy/kubernetes/helm/che/tiller-rbac.yaml &>/dev/null && sleep 20 && helm init --service-account tiller &>/dev/null"
+    docker exec -i k8s_dind bash -c "kubectl create serviceaccount tiller --namespace kube-system && sleep 20 && kubectl apply -f /root/che/deploy/kubernetes/helm/che/tiller-rbac.yaml &>/dev/null && sleep 20 && helm init --service-account tiller &>/dev/null"
     #todo wait tiller pod
     sleep 60
 }
@@ -114,11 +111,11 @@ create_tiller_sa() {
 deploy_che_with_helm() {
     echo "[k8s] deploying CHE, multiuser mode: ${CHE_MULTIUSER}"
     if [ "${CHE_MULTIUSER}" == "false" ];then
-        docker exec -i k8s_dind bash -c "helm upgrade --install che --namespace che --set global.ingressDomain=${IP}.${DNS_PROVIDER} --set global.gitHubClientID=${CHE_OAUTH_GITHUB_CLIENTID} --set global.gitHubClientSecret=${CHE_OAUTH_GITHUB_CLIENTSECRET} /tmp/che/deploy/kubernetes/helm/che >/dev/null"
+        docker exec -i k8s_dind bash -c "helm upgrade --install che --namespace che --set global.ingressDomain=${IP}.${DNS_PROVIDER} --set global.gitHubClientID=${CHE_OAUTH_GITHUB_CLIENTID} --set global.gitHubClientSecret=${CHE_OAUTH_GITHUB_CLIENTSECRET} /root/che/deploy/kubernetes/helm/che >/dev/null"
     else
         docker exec -i k8s_dind bash -c "kubectl create clusterrolebinding add-on-cluster-admin --clusterrole=cluster-admin --serviceaccount=kube-system:default"
         sleep 20
-        docker exec -i k8s_dind bash -c "helm upgrade --install che --namespace che -f /tmp/che/deploy/kubernetes/helm/che/values/multi-user.yaml --set global.ingressDomain=${IP}.${DNS_PROVIDER} /tmp/che/deploy/kubernetes/helm/che"
+        docker exec -i k8s_dind bash -c "helm upgrade --install che --namespace che -f /root/che/deploy/kubernetes/helm/che/values/multi-user.yaml --set global.ingressDomain=${IP}.${DNS_PROVIDER} /root/che/deploy/kubernetes/helm/che"
     fi
     wait_until_server_is_booted
 }
