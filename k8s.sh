@@ -5,7 +5,7 @@ set -e
 
 up() {
     echo "[k8s] starting k8s dind cluster"
-    docker run -d --privileged --shm-size 8G --name=k8s_dind -v /var/run/docker.sock:/var/run/docker.sock -v $K8S_STORAGE_PATH:/tmp -p 30000:30000 -p 8443:8443 -p 80:80 --rm riuvshin/minikube-dind:latest
+    docker run -d --privileged --shm-size 8G --name=k8s_dind -v $LIB_DOCKER:/var/lib/docker -v $K8S_STORAGE_PATH:/tmp -p 30000:30000 -p 8443:8443 -p 80:80 --rm riuvshin/minikube-dind:latest
     wait_k8s
     enable_ingress_addon
     install_helm
@@ -124,5 +124,6 @@ LOCAL_IP_ADDRESS=$(detectIP)
 DNS_PROVIDER=${DNS_PROVIDER:-"nip.io"}
 IP=${IP:-${LOCAL_IP_ADDRESS}}
 CHE_MULTIUSER=${CHE_MULTIUSER:-"false"}
-K8S_STORAGE_PATH=${K8S_STORAGE_PATH:-"~/k8s_dind_storage"}
+K8S_STORAGE_PATH=${K8S_STORAGE_PATH:-"/tmp/k8s_dind_storage"}
+LIB_DOCKER=${LIB_DOCKER:-"/tmp/docker"}
 $@
