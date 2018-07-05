@@ -97,8 +97,11 @@ install_helm() {
 
 get_che_helm_charts() {
     echo "[k8s] get CHE helm charts"
-    docker exec -i k8s_dind bash -c "apt-get -qq update &>/dev/null && apt-get -qq install git -y &>/dev/null"
-    docker exec -i k8s_dind bash -c "cd /tmp/ && git clone --depth 1 https://github.com/eclipse/che.git che &>/dev/null"
+    #docker exec -i k8s_dind bash -c "apt-get -qq update &>/dev/null && apt-get -qq install git -y &>/dev/null"
+    #docker exec -i k8s_dind bash -c "cd /tmp/ && git clone --depth 1 https://github.com/eclipse/che.git che &>/dev/null"
+    docker exec -i k8s_dind bash -c "apt-get update && apt-get install git -y"
+    docker exec -i k8s_dind bash -c "cd /tmp/ && git clone --depth 1 https://github.com/eclipse/che.git che"
+
 }
 
 create_tiller_sa() {
