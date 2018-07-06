@@ -98,7 +98,7 @@ install_helm() {
 get_che_helm_charts() {
     echo "[k8s] get CHE helm charts"
     docker exec -i k8s_dind bash -c "apt-get -qq update &>/dev/null && apt-get -qq install git -y &>/dev/null"
-    docker exec -i k8s_dind bash -c "cd /root/ && git clone --depth 1 https://github.com/eclipse/che.git che &>/dev/null"
+    docker exec -i k8s_dind bash -c "cd /root/ && git clone --depth 1 -b $CHE_BRANCH https://github.com/eclipse/che.git che &>/dev/null"
 }
 
 create_tiller_sa() {
@@ -126,4 +126,5 @@ IP=${IP:-${LOCAL_IP_ADDRESS}}
 CHE_MULTIUSER=${CHE_MULTIUSER:-"false"}
 K8S_STORAGE_PATH=${K8S_STORAGE_PATH:-"/tmp/k8s_dind_storage"}
 LIB_DOCKER=${LIB_DOCKER:-"/tmp/docker"}
+CHE_BRANCH=${CHE_BRANCH:-"master"}
 $@
