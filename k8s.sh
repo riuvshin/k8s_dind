@@ -111,11 +111,11 @@ create_tiller_sa() {
 deploy_che_with_helm() {
     echo "[k8s] deploying CHE, multiuser mode: ${CHE_MULTIUSER}"
     if [ "${CHE_MULTIUSER}" == "false" ];then
-        docker exec -i k8s_dind bash -c "helm upgrade --install che --namespace che --set global.ingressDomain=${IP}.${DNS_PROVIDER} --set global.gitHubClientID=${CHE_OAUTH_GITHUB_CLIENTID} --set global.gitHubClientSecret=${CHE_OAUTH_GITHUB_CLIENTSECRET} /root/che/deploy/kubernetes/helm/che >/dev/null"
+        docker exec -i k8s_dind bash -c "helm upgrade --install che --namespace che --set global.ingressDomain=${IP}.${DNS_PROVIDER} --set global.gitHubClientID=${CHE_OAUTH_GITHUB_CLIENTID} --set global.gitHubClientSecret=${CHE_OAUTH_GITHUB_CLIENTSECRET} --set global.cheInfraKubernetesNamespace=che /root/che/deploy/kubernetes/helm/che >/dev/null"
     else
         docker exec -i k8s_dind bash -c "kubectl create clusterrolebinding add-on-cluster-admin --clusterrole=cluster-admin --serviceaccount=kube-system:default"
         sleep 20
-        docker exec -i k8s_dind bash -c "helm upgrade --install che --namespace che -f /root/che/deploy/kubernetes/helm/che/values/multi-user.yaml --set global.ingressDomain=${IP}.${DNS_PROVIDER} /root/che/deploy/kubernetes/helm/che"
+        docker exec -i k8s_dind bash -c "helm upgrade --install che --namespace che -f /root/che/deploy/kubernetes/helm/che/values/multi-user.yaml --set global.ingressDomain=${IP}.${DNS_PROVIDER} --set global.gitHubClientID=${CHE_OAUTH_GITHUB_CLIENTID} --set global.gitHubClientSecret=${CHE_OAUTH_GITHUB_CLIENTSECRET} --set global.cheInfraKubernetesNamespace=che /root/che/deploy/kubernetes/helm/che >/dev/null"
     fi
     wait_until_server_is_booted
 }
