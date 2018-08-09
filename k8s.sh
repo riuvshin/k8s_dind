@@ -5,7 +5,16 @@ set -e
 
 up() {
     echo "[k8s] starting k8s dind cluster"
-    docker run -d --privileged --shm-size 8G --name=k8s_dind -v $LIB_DOCKER:/var/lib/docker -v $K8S_STORAGE_PATH:/tmp -p 30000:30000 -p 8443:8443 -p 80:80 --rm riuvshin/minikube-dind:latest
+    docker run -d --privileged \
+                  --shm-size 8G \
+                  --name=k8s_dind \
+                  -v $LIB_DOCKER:/var/lib/docker \
+                  -v $K8S_STORAGE_PATH:/tmp \
+                  -p 30000:30000 \
+                  -p 8443:8443 \
+                  -p 80:80 \
+                  --rm \
+                  riuvshin/minikube-dind:latest
     wait_k8s
     enable_ingress_addon
     install_helm
@@ -111,11 +120,27 @@ create_tiller_sa() {
 deploy_che_with_helm() {
     echo "[k8s] deploying CHE, multiuser mode: ${CHE_MULTIUSER}"
     if [ "${CHE_MULTIUSER}" == "false" ];then
-        docker exec -i k8s_dind bash -c "helm upgrade --install che --namespace che --set global.ingressDomain=${IP}.${DNS_PROVIDER} --set global.gitHubClientID=${CHE_OAUTH_GITHUB_CLIENTID} --set global.gitHubClientSecret=${CHE_OAUTH_GITHUB_CLIENTSECRET} --set global.cheWorkspacesNamespace=che --set global.workspaceIdleTimeout=${CHE_LIMITS_WORKSPACE_IDLE_TIMEOUT} /root/che/deploy/kubernetes/helm/che >/dev/null"
+        docker exec -i k8s_dind bash -c "helm upgrade --install che \
+                                                      --namespace che \
+                                                      --set global.ingressDomain=${IP}.${DNS_PROVIDER} \
+                                                      --set global.gitHubClientID=${CHE_OAUTH_GITHUB_CLIENTID} \
+                                                      --set global.gitHubClientSecret=${CHE_OAUTH_GITHUB_CLIENTSECRET} \
+                                                      --set global.cheWorkspacesNamespace=che \
+                                                      --set global.workspaceIdleTimeout=${CHE_LIMITS_WORKSPACE_IDLE_TIMEOUT} \
+                                                      /root/che/deploy/kubernetes/helm/che >/dev/null"
     else
-        docker exec -i k8s_dind bash -c "kubectl create clusterrolebinding add-on-cluster-admin --clusterrole=cluster-admin --serviceaccount=kube-system:default"
+        docker exec -i k8s_dind bash -c "kubectl create clusterrolebinding add-on-cluster-admin --clusterrole=cluster-admin \
+                                                                                                --serviceaccount=kube-system:default"
         sleep 20
-        docker exec -i k8s_dind bash -c "helm upgrade --install che --namespace che -f /root/che/deploy/kubernetes/helm/che/values/multi-user.yaml --set global.ingressDomain=${IP}.${DNS_PROVIDER} --set global.gitHubClientID=${CHE_OAUTH_GITHUB_CLIENTID} --set global.gitHubClientSecret=${CHE_OAUTH_GITHUB_CLIENTSECRET} --set global.cheWorkspacesNamespace=che --set global.workspaceIdleTimeout=${CHE_LIMITS_WORKSPACE_IDLE_TIMEOUT} /root/che/deploy/kubernetes/helm/che >/dev/null"
+        docker exec -i k8s_dind bash -c "helm upgrade --install che \
+                                                      --namespace che \
+                                                      -f /root/che/deploy/kubernetes/helm/che/values/multi-user.yaml \
+                                                      --set global.ingressDomain=${IP}.${DNS_PROVIDER} \
+                                                      --set global.gitHubClientID=${CHE_OAUTH_GITHUB_CLIENTID} \
+                                                      --set global.gitHubClientSecret=${CHE_OAUTH_GITHUB_CLIENTSECRET} \
+                                                      --set global.cheWorkspacesNamespace=che \
+                                                      --set global.workspaceIdleTimeout=${CHE_LIMITS_WORKSPACE_IDLE_TIMEOUT} \
+                                                      /root/che/deploy/kubernetes/helm/che >/dev/null"
     fi
     wait_until_server_is_booted
 }
