@@ -127,6 +127,7 @@ deploy_che_with_helm() {
                                                       --set global.gitHubClientSecret=${CHE_OAUTH_GITHUB_CLIENTSECRET} \
                                                       --set global.cheWorkspacesNamespace=che \
                                                       --set global.workspaceIdleTimeout=${CHE_LIMITS_WORKSPACE_IDLE_TIMEOUT} \
+                                                      --set global.log.loggerConfig=org.eclipse.che=INFO \
                                                       /root/che/deploy/kubernetes/helm/che >/dev/null"
     else
         docker exec -i k8s_dind bash -c "kubectl create clusterrolebinding add-on-cluster-admin --clusterrole=cluster-admin \
@@ -140,6 +141,7 @@ deploy_che_with_helm() {
                                                       --set global.gitHubClientSecret=${CHE_OAUTH_GITHUB_CLIENTSECRET} \
                                                       --set global.cheWorkspacesNamespace=che \
                                                       --set global.workspaceIdleTimeout=${CHE_LIMITS_WORKSPACE_IDLE_TIMEOUT} \
+                                                      --set global.log.loggerConfig=org.eclipse.che=INFO \
                                                       /root/che/deploy/kubernetes/helm/che >/dev/null"
     fi
     wait_until_server_is_booted
