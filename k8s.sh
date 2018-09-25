@@ -14,7 +14,7 @@ up() {
                   -p 8443:8443 \
                   -p 80:80 \
                   --rm \
-                  riuvshin/minikube-dind:latest
+                  ${K8S_DIND_IMAGE}
     wait_k8s
     enable_ingress_addon
     install_helm
@@ -154,4 +154,6 @@ CHE_MULTIUSER=${CHE_MULTIUSER:-"false"}
 K8S_STORAGE_PATH=${K8S_STORAGE_PATH:-"/tmp/k8s_dind_storage"}
 LIB_DOCKER=${LIB_DOCKER:-"/tmp/docker"}
 CHE_BRANCH=${CHE_BRANCH:-"master"}
+K8S_DIND_IMAGE=${K8S_DIND_IMAGE:-"riuvshin/minikube-dind:latest"}
+
 $@
