@@ -119,6 +119,9 @@ create_tiller_sa() {
 
 deploy_che_with_helm() {
     echo "[k8s] deploying CHE, multiuser mode: ${CHE_MULTIUSER}"
+    docker exec -i k8s_dind bash -c "kubectl create clusterrolebinding add-on-cluster-admin --clusterrole=cluster-admin \
+          --serviceaccount=kube-system:default"
+
     if [ "${CHE_MULTIUSER}" == "false" ];then
         docker exec -i k8s_dind bash -c "helm upgrade --install che \
                                                       --namespace che \
@@ -130,8 +133,6 @@ deploy_che_with_helm() {
                                                       --set global.log.loggerConfig=org.eclipse.che=INFO \
                                                       /root/che/deploy/kubernetes/helm/che >/dev/null"
     else
-        docker exec -i k8s_dind bash -c "kubectl create clusterrolebinding add-on-cluster-admin --clusterrole=cluster-admin \
-                                                                                                --serviceaccount=kube-system:default"
         sleep 20
         docker exec -i k8s_dind bash -c "helm upgrade --install che \
                                                       --namespace che \
